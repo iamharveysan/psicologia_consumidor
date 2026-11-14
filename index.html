@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>THE CONSUMER MIND · Laboratorio OVA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Rubik:wght@400;500;700&display=swap');
+
+:root{
+  --bg:#070b14;
+  --panel:#0e1526;
+  --panel2:#121c33;
+  --line:#223052;
+  --ink:#eaf2ff;
+  --muted:#8fa3c4;
+  --cyan:#35e0ff;
+  --magenta:#ff4d9d;
+  --lime:#6cff9c;
+  --amber:#ffb84d;
+  --red:#ff5d5d;
+  --glow-cyan:0 0 14px rgba(53,224,255,.45);
+  --glow-magenta:0 0 14px rgba(255,77,157,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  font:16px/1.65 'Rubik',system-ui,Arial,sans-serif;
+  background:
+    radial-gradient(1100px 500px at 80% -10%,rgba(53,224,255,.08),transparent 60%),
+    radial-gradient(900px 500px at 0% 110%,rgba(255,77,157,.07),transparent 60%),
+    repeating-linear-gradient(0deg,transparent 0 46px,rgba(53,224,255,.035) 46px 47px),
+    repeating-linear-gradient(90deg,transparent 0 46px,rgba(53,224,255,.03) 46px 47px),
+    var(--bg);
+}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:4px}
+h1,h2,h3,.hud,.btn,.tag,.node,.stat strong{font-family:'Chakra Petch',sans-serif}
+h1{font-size:clamp(34px,6.4vw,74px);line-height:1.02;margin:14px 0;letter-spacing:.01em;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--cyan);text-shadow:var(--glow-cyan)}
+h2{font-size:clamp(23px,3vw,34px);margin:8px 0 10px;line-height:1.15}
+h3{font-size:20px;margin:16px 0 8px;line-height:1.3}
+a{color:var(--cyan)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.hide{display:none!important}
+
+/* ---------- HUD ---------- */
+.hud{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:10px max(16px,calc((100vw - 1180px)/2));
+  background:rgba(7,11,20,.92);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+  font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+}
+.hud .logo{font-weight:700;color:var(--ink)}
+.hud .logo i{font-style:normal;color:var(--cyan)}
+.hud .sep{flex:1}
+.hudchip{border:1px solid var(--line);background:var(--panel);padding:5px 11px;border-radius:7px;white-space:nowrap}
+.hudchip b{color:var(--cyan)}
+#hudXp b{color:var(--lime)}
+.hudbar{width:130px;height:9px;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+.hudbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--lime));transition:width .4s}
+
+.wrap{max-width:1180px;margin:auto;padding:24px 18px 80px}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  border:1px solid var(--line);border-radius:18px;
+  padding:clamp(26px,5vw,64px);
+  background:
+    radial-gradient(700px 320px at 75% 0%,rgba(255,77,157,.14),transparent 65%),
+    radial-gradient(800px 400px at 10% 100%,rgba(53,224,255,.12),transparent 60%),
+    var(--panel);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 5px);
+  mix-blend-mode:overlay;
+}
+.hero p{max-width:700px;color:#c3d2ea}
+.press{color:var(--lime);font-family:'Chakra Petch',sans-serif;font-size:14px;letter-spacing:.14em;text-transform:uppercase;animation:blink 1.6s steps(2) infinite;margin-top:22px}
+@keyframes blink{50%{opacity:.25}}
+.pills{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.pills span{border:1px solid var(--line);background:rgba(14,21,38,.7);padding:7px 13px;border-radius:9px;font-size:12.5px;color:#bcd0e8}
+.pills b{color:var(--cyan)}
+
+/* ---------- Panels ---------- */
+.panel{
+  position:relative;
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(20px,3vw,34px);margin-top:22px;
+}
+.panel::before{
+  content:'';position:absolute;top:-1px;left:18px;width:64px;height:3px;
+  background:var(--cyan);border-radius:0 0 4px 4px;box-shadow:var(--glow-cyan);
+}
+.panel.boss::before{background:var(--magenta);box-shadow:var(--glow-magenta)}
+.tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);border:1px solid rgba(53,224,255,.4);border-radius:6px;padding:4px 10px;margin-bottom:6px;
+}
+.panel.boss .tag{color:var(--magenta);border-color:rgba(255,77,157,.45)}
+.grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);gap:26px}
+
+/* ---------- Mapa de niveles ---------- */
+.map{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.node{
+  flex:1 1 90px;min-width:84px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.06em;
+  padding:10px 4px;border:1px solid var(--line);border-radius:9px;color:var(--muted);
+  background:var(--panel2);text-transform:uppercase;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+}
+.node.done{background:rgba(53,224,255,.14);border-color:var(--cyan);color:var(--cyan)}
+.node.active{background:rgba(255,77,157,.16);border-color:var(--magenta);color:#ffd7e9;box-shadow:var(--glow-magenta)}
+.progress{height:11px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin:10px 0}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--magenta));transition:width .4s}
+
+/* ---------- Controles ---------- */
+.btn{
+  border:0;border-radius:9px;padding:14px 22px;font-weight:700;min-height:48px;
+  letter-spacing:.05em;text-transform:uppercase;font-size:14px;
+  background:var(--cyan);color:#04121c;
+  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+}
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--cyan);box-shadow:inset 0 0 0 1.5px var(--cyan)}
+.btn.boss{background:var(--magenta);color:#2a0516}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;letter-spacing:.05em;text-transform:uppercase;color:#b9cae4}
+input{
+  width:100%;padding:13px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2);color:var(--ink);
+}
+input::placeholder{color:#5f7398}
+.helper{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:16px;margin:12px 0}
+.helper b{color:var(--cyan)}
+.error-text{color:var(--red);font-weight:500}
+
+/* ---------- Video ---------- */
+.video{aspect-ratio:16/9;background:#02060c;border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.video>div,.video iframe{width:100%;height:100%;border:0}
+.status{border:1px solid rgba(108,255,156,.4);background:rgba(108,255,156,.08);border-radius:10px;padding:13px 16px;margin:16px 0}
+.status.warn{border-color:rgba(255,184,77,.5);background:rgba(255,184,77,.08)}
+.status.error{border-color:rgba(255,93,93,.5);background:rgba(255,93,93,.08)}
+.notes{padding-left:22px;margin:10px 0}
+.notes li{margin-bottom:10px}
+details{border:1px solid var(--line);border-radius:11px;background:var(--panel2);padding:13px 16px;margin-top:16px}
+summary{cursor:pointer;font-weight:700;color:var(--amber)}
+
+/* ---------- Lección, caso y quiz ---------- */
+.lesson{border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:12px;padding:18px;background:var(--panel2);margin:16px 0}
+.case{
+  border:1px solid rgba(255,77,157,.4);border-radius:13px;padding:20px 22px;margin:20px 0;
+  background:linear-gradient(135deg,rgba(255,77,157,.12),rgba(255,77,157,.03));
+}
+.case .tag{color:var(--magenta);border-color:rgba(255,77,157,.45)}
+.answers{display:grid;gap:10px;margin:16px 0}
+.answer{
+  text-align:left;padding:14px 16px;line-height:1.5;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);
+}
+.answer:hover:not(:disabled){border-color:var(--cyan)}
+.answer.chosen{border-color:var(--magenta);background:rgba(255,77,157,.12)}
+.answer:disabled{cursor:default;opacity:.75}
+.answer.chosen:disabled{opacity:1;border-color:var(--lime);background:rgba(108,255,156,.1)}
+.feedback{border-radius:11px;border:1px solid rgba(108,255,156,.45);background:rgba(108,255,156,.08);padding:15px 17px;margin:14px 0}
+.feedback.bad{border-color:rgba(255,93,93,.5);background:rgba(255,93,93,.08)}
+.feedback b{color:var(--lime)}
+.feedback.bad b{color:var(--red)}
+.xpgain{color:var(--lime);font-family:'Chakra Petch',sans-serif;font-weight:700}
+
+/* ---------- Resultado ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.stat{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:16px}
+.stat span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat strong{display:block;font-size:30px;color:var(--cyan)}
+.certificate{
+  border:2px solid var(--cyan);border-radius:4px;padding:38px 28px;text-align:center;margin-top:26px;
+  background:var(--panel2);position:relative;
+}
+.certificate::before,.certificate::after{
+  content:'';position:absolute;width:26px;height:26px;border:2px solid var(--magenta);
+}
+.certificate::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+.certificate::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.certificate h2{font-size:34px;letter-spacing:.06em}
+.certificate .name{font-size:28px;font-weight:700;color:var(--cyan);font-family:'Chakra Petch',sans-serif}
+.certificate .certStats{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;color:var(--lime);letter-spacing:.04em}
+footer{text-align:center;color:var(--muted);font-size:12px;margin:34px 0 10px}
+
+/* ---------- Responsive ---------- */
+@media(max-width:860px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .wrap{padding:14px 12px 50px}
+  .hud{gap:8px;font-size:12px}
+  .hudbar{display:none}
+  .hero{border-radius:13px}
+  .panel{border-radius:13px}
+  .node{min-width:70px;font-size:10px}
+  .actions .btn{width:100%}
+}
+@media(max-width:400px){.stats{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+
+/* ---------- Impresión: solo la constancia ---------- */
+@media print{
+  body{background:white;color:#111}
+  .hud,.hero,.no-print,footer,.panel:not(#result){display:none!important}
+  .wrap{padding:0}
+  #result{border:0;background:white;color:#111}
+  #result::before{display:none}
+  #result .stats,#result .status,#result>h2,#result .tag,#result>p{display:none}
+  .certificate{border-color:#111;background:white;color:#111;break-inside:avoid}
+  .certificate::before,.certificate::after{border-color:#111}
+  .certificate .name,.certificate h2,.certificate .certStats{color:#111;text-shadow:none}
+  .certificate .muted{color:#555}
+}
+</style>
+</head>
+<body>
+
+<header class="hud">
+  <span class="logo"><i>◉</i> THE CONSUMER MIND</span>
+  <span class="sep"></span>
+  <span class="hudchip hide" id="hudPlayer">Jugador: <b id="hudName"></b></span>
+  <span class="hudchip hide" id="hudXp"><b id="xpVal">0</b> XP</span>
+  <span class="hudchip hide" id="hudStage"><b id="count">0 / 8</b> niveles</span>
+  <span class="hudbar hide" id="hudBarBox" aria-hidden="true"><i id="hudBar"></i></span>
+</header>
+
+<main class="wrap">
+
+<section class="hero">
+  <span class="tag">Laboratorio de psicología del consumidor</span>
+  <h1>Entender al cliente <em>cambia todo</em></h1>
+  <p>Explora cómo se forman las expectativas, qué determina la satisfacción y por qué un cliente decide volver, recomendar o abandonar una marca. Cada nivel se desbloquea únicamente al resolverlo: observa, aplica y derrota al caso final.</p>
+  <div class="pills">
+    <span><b>Nivel 00</b> Briefing en video</span>
+    <span><b>Niveles 01–06</b> Misiones aplicadas</span>
+    <span><b>Jefe final</b> Caso integrador</span>
+    <span><b>Victoria</b> Informe y constancia</span>
+  </div>
+  <p class="press">▸ Crea tu jugador para comenzar</p>
+</section>
+
+<section id="identity" class="panel">
+  <span class="tag">Nueva partida</span>
+  <h2>Tu experiencia es individual</h2>
+  <p class="muted">Escribe tu nombre y apellido. Tu progreso se guarda en este navegador para que puedas retomarlo. Si otra persona jugó antes en este equipo, al escribir un nombre distinto comienza una partida nueva.</p>
+  <div class="grid">
+    <div>
+      <label for="student">Nombre y apellido</label>
+      <input id="student" autocomplete="name" placeholder="Escribe tu nombre y apellido">
+      <label for="course">Curso o grupo (opcional)</label>
+      <input id="course" placeholder="Psicología del Consumidor">
+      <div class="actions">
+        <button id="start" class="btn">Comenzar laboratorio ▸</button>
+        <button id="reset" class="btn ghost">Borrar progreso guardado</button>
+      </div>
+      <p id="identityError" class="small error-text" role="alert"></p>
+    </div>
+    <aside class="helper">
+      <b>¿Cómo se gana?</b>
+      <p>Observa el video, responde cuatro preguntas, supera dos desafíos en cada misión y resuelve el caso final. Cada acierto suma XP; acertar al primer intento otorga el bonus máximo.</p>
+      <p class="small muted">Los casos son didácticos y no corresponden a empresas reales.</p>
+    </aside>
+  </div>
+</section>
+
+<section id="app" class="hide">
+
+  <section class="panel no-print">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <b id="route" style="font-family:'Chakra Petch',sans-serif;letter-spacing:.06em">NIVEL 00 · BRIEFING</b>
+      <span class="small muted" id="precisionLabel"></span>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="overall"></i></div>
+    <div id="steps" class="map" role="list" aria-label="Mapa de niveles"></div>
+  </section>
+
+  <section id="videoStage" class="panel">
+    <span class="tag">Nivel 00 · Briefing obligatorio</span>
+    <h2 tabindex="-1">Primero observa. Después demuestra.</h2>
+    <p>Reproduce el video de <b>Edutin Academy</b> sobre comportamiento del cliente y fidelización. Debes completar la reproducción y superar cuatro preguntas para abrir el laboratorio.</p>
+    <div class="grid">
+      <div>
+        <div class="video"><div id="ytplayer"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:16px">
+          <b class="small">Segmentos reproducidos</b><b id="watchLabel" class="small">0%</b>
+        </div>
+        <div class="progress" aria-hidden="true"><i id="watchBar"></i></div>
+        <div id="videoStatus" class="status" role="status">El reproductor se iniciará al comenzar.</div>
+        <div class="actions">
+          <button id="retry" class="btn ghost">Recargar reproductor</button>
+          <a class="btn ghost" style="text-decoration:none" href="https://www.youtube.com/watch?v=W3Mk-d97gEA" target="_blank" rel="noopener">Abrir video en YouTube ↗</a>
+        </div>
+        <p class="small muted">El seguimiento registra los fragmentos reproducidos dentro de esta página: adelantar el video no cuenta como verlo, y debes mantener la pestaña visible mientras se reproduce. Verlo directamente en YouTube tampoco registra avance.</p>
+        <details id="unlockBox">
+          <summary>¿El video no carga en tu red? Desbloqueo docente</summary>
+          <p class="small muted">Si YouTube está bloqueado o el reproductor falla, mira el video por otro medio y pide a tu docente el código de desbloqueo para continuar con la evaluación.</p>
+          <label for="unlockCode">Código de desbloqueo</label>
+          <input id="unlockCode" autocomplete="off" placeholder="Código entregado por tu docente">
+          <div class="actions"><button id="unlockBtn" class="btn ghost">Desbloquear evaluación</button></div>
+          <p id="unlockError" class="small error-text" role="alert"></p>
+        </details>
+      </div>
+      <aside>
+        <div class="helper">
+          <b>Mientras observas, identifica:</b>
+          <ol class="notes">
+            <li>¿Cómo se forman las expectativas antes de comprar?</li>
+            <li>¿Qué diferencia existe entre satisfacción y lealtad?</li>
+            <li>¿Por qué la integración de canales afecta la experiencia?</li>
+            <li>¿Cómo influyen cultura, motivación y experiencias anteriores?</li>
+          </ol>
+        </div>
+        <div class="helper">
+          <b>Contenido de la clase</b>
+          <p class="small">Expectativas · satisfacción · lealtad · comportamiento de compra · valor del cliente · canales · resolución de problemas · omnicanalidad · innovación · motivaciones · cultura · información disponible.</p>
+        </div>
+      </aside>
+    </div>
+    <div id="videoQuiz" class="hide">
+      <hr style="border:0;border-top:1px solid var(--line);margin:28px 0">
+      <span class="tag">Evaluación de comprensión</span>
+      <h2>Lo que aprendiste del video</h2>
+      <p>Resuelve cuatro situaciones. No podrás avanzar hasta acertar todas.</p>
+      <div id="videoQuizArea"></div>
+    </div>
+  </section>
+
+  <section id="missionStage" class="panel hide">
+    <span class="tag" id="missionTag"></span>
+    <h2 id="missionTitle" tabindex="-1"></h2>
+    <p id="missionIntro" class="muted"></p>
+    <div class="lesson" id="theory"></div>
+    <div class="case"><span class="tag">Situación aplicada</span><p id="caseText"></p></div>
+    <div id="missionQuiz"></div>
+  </section>
+
+  <section id="finalStage" class="panel boss hide">
+    <span class="tag">Jefe final · Caso integrador</span>
+    <h2 tabindex="-1">Una experiencia, varios problemas</h2>
+    <div class="case">
+      <span class="tag">Caso de análisis</span>
+      <p>Una persona compra un artículo en una tienda digital. La publicidad prometía entrega en 24 horas, pero llega cuatro días después. Pregunta por Instagram, luego reclama por WhatsApp y debe repetir todos sus datos. La empresa soluciona el inconveniente, pero el cliente no recomienda la tienda.</p>
+    </div>
+    <p>Demuestra que puedes relacionar expectativas, experiencia omnicanal, resolución de problemas y lealtad.</p>
+    <div id="finalQuiz"></div>
+  </section>
+
+  <section id="result" class="panel hide">
+    <span class="tag">Victoria</span>
+    <h2 tabindex="-1">Dominio demostrado</h2>
+    <p id="summary"></p>
+    <div class="stats">
+      <div class="stat"><span>Niveles</span><strong>8 / 8</strong></div>
+      <div class="stat"><span>Desafíos</span><strong>20 / 20</strong></div>
+      <div class="stat"><span>XP total</span><strong id="xpFinal">0</strong></div>
+      <div class="stat"><span>Precisión</span><strong id="precisionFinal">—</strong></div>
+    </div>
+    <div class="status">La finalización indica que respondiste correctamente todos los desafíos obligatorios. El informe registra también los errores y reintentos.</div>
+    <div class="actions no-print">
+      <button id="download" class="btn ghost">Descargar informe individual</button>
+      <button id="print" class="btn">Guardar constancia en PDF</button>
+    </div>
+    <div class="certificate">
+      <div style="font-size:50px;color:var(--cyan)" aria-hidden="true">⬡</div>
+      <p class="small" style="letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Constancia de finalización académica</p>
+      <h2>THE CONSUMER MIND</h2>
+      <p>Ha completado el laboratorio interactivo de</p>
+      <h3>Comportamiento del consumidor y fidelización</h3>
+      <p class="name" id="certName"></p>
+      <p id="certCourse"></p>
+      <p>Observación del video, seis misiones de aplicación y evaluación integradora superadas.</p>
+      <p class="certStats" id="certStats"></p>
+      <p id="certDate"></p>
+      <p class="small muted">Documento generado localmente por el OVA. No es una certificación institucional ni valida identidad.</p>
+    </div>
+  </section>
+
+</section>
+
+<footer>Laboratorio formativo · Contenido didáctico basado en la transcripción proporcionada · Sin conexión a servicios de evaluación</footer>
+</main>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+/* ============ Configuración ============ */
+const VIDEO_ID = 'W3Mk-d97gEA';
+const EMBED_URL = 'https://www.youtube.com/embed/' + VIDEO_ID;
+const STORE = 'consumer_mind_ova_v4';
+const FALLBACK_DURATION = 765;          // duración aproximada si la API no la entrega aún
+const UNLOCK_CODE = atob('TUVOVEUtRE9DRU5URQ=='); // código docente: cámbialo regenerando el base64
+
+/* ============ Estado ============ */
+function freshState(){
+  return {v:4,name:'',course:'',stage:0,videoComplete:false,unlocked:false,
+          videoIndex:0,missionIndex:0,finalIndex:0,
+          xp:0,attempts:0,fails:0,log:[],completedAt:null};
+}
+let state = freshState();
+let seen = new Set();
+let player=null, playing=false, prevPos=null, prevWall=0, ticker=null, lastSavedBins=0;
+
+/* Firma ligera: disuade la edición casual del progreso guardado */
+function sign(s){
+  const str=[s.name,s.stage,s.xp,s.attempts,s.fails,s.videoComplete,s.completedAt||''].join('|')+'|cm4';
+  let h=5381;
+  for(let i=0;i<str.length;i++) h=((h*33)^str.charCodeAt(i))>>>0;
+  return h.toString(36);
+}
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({...state,seen:[...seen],sig:sign(state)})); }catch(e){}
+}
+function loadSaved(){
+  try{
+    const x=JSON.parse(localStorage.getItem(STORE)||'null');
+    if(x && x.name && Number.isInteger(x.stage) && x.stage>=0 && x.stage<=8 && x.sig===sign(x)) return x;
+  }catch(e){}
+  return null;
+}
+const norm = s => s.trim().replace(/\s+/g,' ').toLowerCase();
+
+/* ============ Contenido (idéntico a la versión original) ============ */
+const videoQuestions=[
+{q:'Según el video, ¿cómo se forman las expectativas de un cliente?',o:['Solo a partir del precio','Por experiencias previas, publicidad, recomendaciones y reputación','Únicamente después de recibir el producto'],a:1,why:'Las expectativas son percepciones anticipadas que pueden formarse antes de comprar mediante experiencias, publicidad, recomendaciones y reputación.'},
+{q:'Una persona quedó satisfecha con su compra. ¿Qué conclusión es más precisa?',o:['Ya es necesariamente leal a la marca','La satisfacción puede favorecer la recompra, pero no garantiza lealtad','La satisfacción elimina futuras quejas'],a:1,why:'El video diferencia satisfacción (cumplimiento de expectativas) de lealtad (relación sostenida, compras repetidas y recomendaciones).'},
+{q:'¿Qué caracteriza una experiencia omnicanal?',o:['Tener cuentas en muchas redes sin conexión','Integrar información y servicio entre puntos de contacto','Responder exclusivamente por teléfono'],a:1,why:'La omnicanalidad exige una experiencia integrada y coherente, no solo la presencia de múltiples canales.'},
+{q:'¿Qué conjunto corresponde a factores que influyen en las decisiones de compra?',o:['Motivaciones, cultura, experiencias previas e información disponible','Únicamente publicidad y descuentos','Solo edad y ubicación'],a:0,why:'El video señala necesidades, motivaciones, experiencias, cultura, expectativas e información disponible como factores influyentes.'}
+];
+const missions=[
+{title:'La promesa frente a la realidad',intro:'Expectativas, satisfacción y percepción del servicio.',theory:'<b>Expectativa</b> es lo que una persona anticipa que recibirá. <b>Satisfacción</b> es la evaluación de su experiencia frente a lo esperado. No son sinónimos. Una promesa publicitaria puede elevar la expectativa incluso antes de la compra.<br><br><b>Ejemplo:</b> una tienda anuncia entrega en 24 horas. Si tarda cuatro días, el producto puede funcionar perfectamente y aun así generar insatisfacción por el incumplimiento.',case:'Una persona compra unos audífonos anunciados con entrega al día siguiente. Llegan cuatro días después, sin daños.',qs:[{q:'¿Cuál es el problema principal?',o:['El cliente no tiene motivación de compra','La experiencia incumplió la expectativa creada','La lealtad quedó demostrada'],a:1,why:'La expectativa de entrega fue creada por la promesa. El producto intacto no borra el incumplimiento del servicio.'},{q:'¿Qué acción gestiona mejor las expectativas futuras?',o:['Seguir prometiendo 24 horas para atraer más compradores','Ocultar los plazos en la página','Informar plazos realistas y mejorar la logística'],a:2,why:'La transparencia y el cumplimiento reducen la brecha entre expectativa y experiencia.'}]},
+{title:'¿Por qué elegimos lo que elegimos?',intro:'Necesidades, motivaciones, cultura y experiencias previas.',theory:'Una <b>necesidad</b> es aquello que la persona busca satisfacer; una <b>motivación</b> es la fuerza que la impulsa a actuar. Puede ser funcional, emocional o social. La cultura y las experiencias anteriores también influyen.<br><br><b>Ejemplo:</b> dos personas compran el mismo calzado: una prioriza comodidad para caminar; otra busca expresar su estilo. El producto coincide, pero la motivación no.',case:'Una estudiante elige una mochila porque necesita llevar su computador. Entre varias opciones, prefiere una que también combine con su estilo.',qs:[{q:'¿Qué identifica correctamente los dos elementos?',o:['Necesidad: transportar el computador; motivación adicional: expresar estilo','Necesidad: recibir descuentos; cultura: el color','La marca define por completo las necesidades'],a:0,why:'Transportar el computador responde a una necesidad funcional. La expresión personal puede motivar la elección específica.'},{q:'Un cliente evita una tienda porque antes tuvo un problema sin resolver. ¿Qué factor pesa especialmente?',o:['Experiencia previa','Únicamente el empaque','Valor de vida del cliente'],a:0,why:'Las experiencias anteriores pueden modificar la confianza y las decisiones futuras.'}]},
+{title:'La queja que cambia la relación',intro:'Resolución de problemas, satisfacción y confianza.',theory:'Resolver una queja no significa solo contestar con amabilidad: implica comprender el problema, ofrecer una solución viable, comunicar plazos y comprobar el cierre. Una buena gestión puede recuperar confianza, aunque no garantiza fidelidad.<br><br><b>Ejemplo:</b> si un pedido llega incompleto, disculparse es insuficiente si no se envía lo faltante o se ofrece una alternativa razonable.',case:'Un cliente recibe un pedido incompleto y publica una reseña negativa.',qs:[{q:'¿Cuál es la mejor primera respuesta?',o:['Borrar la reseña para evitar mala imagen','Reconocer el problema, verificar el pedido y proponer una solución concreta','Pedir al cliente que vuelva a comprar'],a:1,why:'Una gestión efectiva reconoce el inconveniente y trabaja en una solución verificable.'},{q:'¿Qué evidencia permite saber si la queja quedó realmente resuelta?',o:['El número de emojis de la respuesta','La confirmación de la solución y el seguimiento del caso','La cantidad de seguidores de la tienda'],a:1,why:'La resolución debe evaluarse por el resultado y la experiencia del cliente, no por la apariencia del mensaje.'}]},
+{title:'El cliente atraviesa varios canales',intro:'Multicanalidad frente a experiencia omnicanal.',theory:'<b>Multicanalidad</b> significa atender por distintos medios. <b>Omnicanalidad</b> implica que esos medios funcionen de manera conectada, manteniendo continuidad de información y servicio.<br><br><b>Ejemplo:</b> si alguien pregunta por Instagram, compra en la web y reclama por WhatsApp, no debería reconstruir su historia desde cero en cada paso.',case:'Una persona consulta por redes, compra por la web y pide ayuda por WhatsApp. Cada agente desconoce las conversaciones anteriores.',qs:[{q:'¿Qué falla en esta experiencia?',o:['La continuidad entre canales','La existencia de redes sociales','La necesidad del consumidor'],a:0,why:'El problema no es tener varios canales, sino que no compartan contexto ni información.'},{q:'¿Qué mejora es verdaderamente omnicanal?',o:['Abrir otra red social','Usar un identificador de pedido y un historial de atención accesible entre canales','Pedir al cliente que repita su problema en cada contacto'],a:1,why:'La integración permite continuidad, coherencia y menos fricción.'}]},
+{title:'Una compra no significa fidelidad',intro:'Recompra, lealtad y valor de vida del cliente.',theory:'<b>Comportamiento de compra</b> incluye qué, cuándo y con qué frecuencia compra alguien. <b>Lealtad</b> supone una relación más sostenida, que puede reflejarse en preferencia, recompra y recomendación. <b>Valor de vida del cliente (CLV)</b> estima la contribución económica a lo largo de esa relación.<br><br><b>Ejemplo didáctico:</b> 4 compras anuales × $50.000 por compra × 3 años = $600.000 de ingresos estimados. No equivale a utilidad: para eso hay que considerar costos y márgenes.',case:'Cliente A compra una vez por $250.000. Cliente B compra cuatro veces al año por $50.000 durante tres años.',qs:[{q:'Con el cálculo simplificado de ingresos, ¿cuánto representa el cliente B en tres años?',o:['$150.000','$600.000','$250.000'],a:1,why:'4 compras/año × $50.000 × 3 años = $600.000. Es ingreso estimado, no ganancia neta.'},{q:'¿Cuál afirmación es correcta?',o:['Una compra grande demuestra lealtad','Repetir una compra puede ser un indicio de lealtad, pero debe interpretarse con más información','El CLV se calcula solo contando seguidores'],a:1,why:'La lealtad no se determina por una compra aislada. Conviene analizar repetición, preferencia, satisfacción y recomendaciones.'}]},
+{title:'El consumidor digital cambia',intro:'Información, innovación, adaptación y ética.',theory:'El consumidor puede comparar precios, consultar opiniones y alternar canales antes de comprar. Las empresas deben ofrecer información clara, experiencias consistentes e innovaciones útiles.<br><br><b>Ejemplo:</b> un comercio puede incorporar seguimiento de pedidos y comparaciones transparentes, en lugar de añadir funciones vistosas que no resuelven las dudas del cliente.',case:'Una tienda digital recibe consultas constantes sobre materiales, devoluciones y tiempos de entrega.',qs:[{q:'¿Qué intervención responde mejor a la información que busca el cliente?',o:['Mostrar fichas claras, condiciones de devolución y seguimiento del pedido','Esconder las condiciones en un texto ilegible','Sustituir toda la información por una cuenta regresiva'],a:0,why:'La información accesible, clara y precisa favorece decisiones informadas.'},{q:'¿Qué representa una adaptación centrada en el cliente?',o:['Agregar tecnología sin conocer los problemas','Mejorar el proceso a partir de necesidades, comentarios y fricciones observadas','Copiar cualquier tendencia digital'],a:1,why:'Innovar tiene sentido cuando responde a necesidades cambiantes y mejora la experiencia.'}]}
+];
+const finalQuestions=[
+{q:'¿Cuál fue la primera expectativa incumplida?',o:['Que la mochila fuera azul','Recibir el pedido en 24 horas','Recibir una llamada comercial'],a:1,why:'La promesa de entrega formó una expectativa específica que no se cumplió.'},
+{q:'¿Qué falla al pedir de nuevo todos los datos por WhatsApp?',o:['La integración omnicanal','La cultura del consumidor','La frecuencia de compra'],a:0,why:'La información no acompaña al cliente entre puntos de contacto.'},
+{q:'Aunque recibió una solución, no recomienda la tienda. ¿Qué interpretación es válida?',o:['Resolver el problema garantiza lealtad','La solución no asegura por sí sola satisfacción plena ni recomendación','La marca ya conoce su CLV exacto'],a:1,why:'La recuperación del servicio puede ayudar, pero no garantiza fidelidad ni recomendación.'},
+{q:'¿Qué mejora conjunta sería más razonable?',o:['Más publicidad con la misma promesa y sin cambiar el servicio','Plazos realistas, trazabilidad del pedido y atención conectada','Eliminar el canal de soporte'],a:1,why:'Una solución integral gestiona expectativas, reduce fricción y mejora el servicio.'}
+];
+const TOTAL_Q = 20;
+
+/* ============ Utilidades ============ */
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function precision(){const answered=state.stage===8?TOTAL_Q:Math.max(1,state.log.filter(r=>r.correct).length);return Math.round(answered/(answered+state.fails)*100);}
+function fmtDate(iso){const d=iso?new Date(iso):new Date();return d.toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});}
+
+/* ============ HUD y navegación ============ */
+function updateHUD(){
+  ['hudPlayer','hudXp','hudStage','hudBarBox'].forEach(id=>$(id).classList.remove('hide'));
+  $('hudName').textContent=state.name.split(' ')[0];
+  $('xpVal').textContent=state.xp;
+  $('count').textContent=state.stage+' / 8';
+  $('hudBar').style.width=(state.stage/8*100)+'%';
+}
+function route(){
+  const n=state.stage;
+  $('route').textContent = n===0?'NIVEL 00 · BRIEFING' : n<=6?'NIVEL '+String(n).padStart(2,'0')+' · MISIÓN' : n===7?'JEFE FINAL':'VICTORIA';
+  $('overall').style.width=(n/8*100)+'%';
+  $('precisionLabel').textContent = state.attempts>0 ? 'Precisión actual: '+precision()+'%' : '';
+  $('steps').innerHTML = Array.from({length:8},(_,i)=>{
+    const cls = i<n?'done':i===n?'active':'';
+    const label = i===0?'BRIEFING':i===7?'JEFE':'NIVEL '+i;
+    const stateTxt = i<n?'completado':i===n?'en curso':'bloqueado';
+    return '<div class="node '+cls+'" role="listitem" aria-label="'+label+': '+stateTxt+'">'+label+(i<n?' ✓':'')+'</div>';
+  }).join('');
+  updateHUD();
+}
+function setVisible(id){
+  ['videoStage','missionStage','finalStage','result'].forEach(k=>$(k).classList.toggle('hide',k!==id));
+  window.scrollTo({top:Math.max(0,$('app').offsetTop-70),behavior:'smooth'});
+  route();
+  const h=$(id).querySelector('h2');
+  if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}
+}
+function enter(){
+  $('identity').classList.add('hide');
+  $('app').classList.remove('hide');
+  if(state.stage===0){
+    setVisible('videoStage');
+    updateVideoUI();
+    if(state.videoComplete){showVideoQuiz();}else{loadVideo();}
+  }else if(state.stage<=6){renderMission();setVisible('missionStage');}
+  else if(state.stage===7){renderFinal();setVisible('finalStage');}
+  else{showResult();setVisible('result');}
+}
+
+/* ============ Identidad ============ */
+const savedAtLoad = loadSaved();
+if(savedAtLoad){
+  $('student').value=savedAtLoad.name;
+  $('course').value=savedAtLoad.course;
+  $('start').textContent='Continuar mi partida ▸';
+}
+$('student').addEventListener('input',()=>{
+  $('start').textContent = (savedAtLoad && norm($('student').value)===norm(savedAtLoad.name)) ? 'Continuar mi partida ▸' : 'Comenzar laboratorio ▸';
+});
+$('start').onclick=()=>{
+  const name=$('student').value.trim().replace(/\s+/g,' ');
+  if(name.split(' ').length<2){$('identityError').textContent='Escribe tu nombre y apellido para iniciar.';return;}
+  $('identityError').textContent='';
+  const saved=loadSaved();
+  if(saved && norm(saved.name)===norm(name)){
+    state={...freshState(),...saved};
+    seen=new Set(saved.seen||[]);
+  }else{
+    state=freshState();                 // nombre distinto: partida nueva, sin heredar progreso ajeno
+    seen=new Set();
+    state.name=name;
+  }
+  state.course=$('course').value.trim();
+  save();
+  enter();
+};
+$('reset').onclick=()=>{
+  if(confirm('¿Deseas borrar el progreso guardado en este navegador?')){
+    try{localStorage.removeItem(STORE);}catch(e){}
+    location.reload();
+  }
+};
+
+/* ============ Video con seguimiento ============ */
+function status(msg,type){$('videoStatus').className='status '+(type||'');$('videoStatus').textContent=msg;}
+function destroyVideo(){
+  if(ticker){clearInterval(ticker);ticker=null;}
+  if(player&&typeof player.destroy==='function'){try{player.destroy();}catch(e){}}
+  player=null;playing=false;
+  const h=$('ytplayer');if(h)h.innerHTML='';
+}
+function showEmbedFallback(){
+  destroyVideo();
+  const holder=$('ytplayer');
+  const frame=document.createElement('iframe');
+  frame.src=EMBED_URL;
+  frame.title='Video: comportamiento del cliente y fidelización';
+  frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.allowFullscreen=true;
+  holder.appendChild(frame);
+  status('Reproductor alternativo disponible. Este modo no registra la reproducción: si logras ver el video aquí o en YouTube, pide a tu docente el código de desbloqueo para continuar.','warn');
+  $('unlockBox').open=true;
+}
+function loadVideo(){
+  if(state.videoComplete)return;
+  if(location.protocol==='file:'){
+    status('Estás abriendo el archivo directamente desde tu equipo. Abre el laboratorio desde su enlace publicado (https) para que YouTube funcione; si no es posible, usa el desbloqueo docente.','warn');
+  }else{
+    status('Conectando con YouTube. Presiona reproducir cuando aparezca el video.');
+  }
+  if(window.YT&&YT.Player){createPlayer();return;}
+  if(!document.getElementById('ytapi')){
+    const s=document.createElement('script');
+    s.id='ytapi';s.src='https://www.youtube.com/iframe_api';
+    s.onerror=()=>showEmbedFallback();
+    document.head.appendChild(s);
+  }
+}
+window.onYouTubeIframeAPIReady=function(){if(state.stage===0&&!state.videoComplete)createPlayer();};
+function createPlayer(){
+  try{
+    destroyVideo();
+    const holder=$('ytplayer');
+    const div=document.createElement('div');div.id='youtubeTarget';holder.appendChild(div);
+    const vars={playsinline:1,rel:0,controls:1,enablejsapi:1};
+    if(location.protocol==='http:'||location.protocol==='https:')vars.origin=location.origin;
+    player=new YT.Player('youtubeTarget',{width:'100%',height:'100%',videoId:VIDEO_ID,playerVars:vars,events:{
+      onReady:()=>status('Video listo. Reproduce la clase desde el inicio; los fragmentos vistos se registran.'),
+      onError:()=>showEmbedFallback(),
+      onStateChange:e=>{
+        playing=e.data===YT.PlayerState.PLAYING;
+        if(playing){prevPos=null;prevWall=performance.now();}
+        if(e.data===YT.PlayerState.ENDED){playing=false;updateVideoUI();}
+      }
+    }});
+    ticker=setInterval(tick,500);
+  }catch(e){showEmbedFallback();}
+}
+function tick(){
+  if(!player||!playing||state.videoComplete)return;
+  try{
+    const pos=player.getCurrentTime(),duration=player.getDuration(),wall=performance.now();
+    if(prevPos!==null){
+      const delta=pos-prevPos,elapsed=(wall-prevWall)/1000;
+      if(delta>0&&delta<=elapsed+0.75&&delta<2){
+        const from=Math.floor(prevPos/2),to=Math.floor(pos/2);
+        for(let i=from;i<=to;i++)seen.add(i);
+      }
+    }
+    prevPos=pos;prevWall=wall;
+    if(duration>0){
+      const bins=Math.ceil(duration/2),ratio=seen.size/bins;
+      if(ratio>=.94&&pos>=duration-12){
+        state.videoComplete=true;playing=false;save();
+        destroyVideo();
+        showVideoQuiz();
+        status('Reproducción completada. Ahora supera la evaluación de comprensión.');
+      }
+      updateVideoUI(duration);
+    }
+    if(seen.size-lastSavedBins>=5){lastSavedBins=seen.size;save();}
+  }catch(e){}
+}
+function updateVideoUI(duration){
+  const bins=Math.ceil((duration||FALLBACK_DURATION)/2);
+  const pct=Math.min(100,Math.round(seen.size/bins*100));
+  $('watchLabel').textContent=(state.videoComplete?100:pct)+'%';
+  $('watchBar').style.width=(state.videoComplete?100:pct)+'%';
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){prevPos=null;save();}
+  else if(playing&&!state.videoComplete)status('Pestaña visible de nuevo. Recuerda: los segundos reproducidos con la pestaña oculta no se registran.','warn');
+});
+window.addEventListener('pagehide',save);
+$('retry').onclick=()=>{if(window.YT&&YT.Player)createPlayer();else loadVideo();};
+$('unlockBtn').onclick=()=>{
+  const code=$('unlockCode').value.trim().toUpperCase();
+  if(code!==UNLOCK_CODE.toUpperCase()){$('unlockError').textContent='Código incorrecto. Verifícalo con tu docente.';return;}
+  $('unlockError').textContent='';
+  state.videoComplete=true;state.unlocked=true;
+  state.log.push({kind:'sistema',question:'Desbloqueo docente del video',answer:'Código válido ingresado',correct:true,explanation:'El video se verificó por un medio alterno autorizado por el docente.'});
+  save();destroyVideo();
+  updateVideoUI();showVideoQuiz();
+  status('Evaluación desbloqueada por código docente. El informe registrará este desbloqueo.');
+};
+
+/* ============ Motor de quiz ============ */
+function xpFor(fails){return fails===0?100:fails===1?60:30;}
+function quiz(target,questions,index,kind,complete){
+  if(index>=questions.length){complete();return;}
+  const q=questions[index];
+  const order=shuffle([...q.o.keys()]);    // opciones en orden aleatorio en cada intento
+  let choice=-1,checked=false,failsHere=0;
+  const root=$(target);
+  root.innerHTML=
+    '<span class="tag">Desafío '+(index+1)+' de '+questions.length+'</span>'+
+    '<h3 tabindex="-1">'+esc(q.q)+'</h3>'+
+    '<div class="answers" role="group" aria-label="Opciones de respuesta">'+
+      order.map((orig,i)=>'<button type="button" class="answer" data-i="'+orig+'" aria-pressed="false">'+String.fromCharCode(65+i)+'. '+esc(q.o[orig])+'</button>').join('')+
+    '</div>'+
+    '<div id="fb_'+kind+'" aria-live="polite"></div>'+
+    '<div class="actions"><button type="button" class="btn" id="check_'+kind+'" disabled>Comprobar respuesta ▸</button></div>';
+  root.querySelector('h3').focus({preventScroll:true});
+  const buttons=[...root.querySelectorAll('.answer')],check=$('check_'+kind);
+  buttons.forEach(b=>b.onclick=()=>{
+    if(checked)return;
+    choice=Number(b.dataset.i);
+    buttons.forEach(z=>{const on=z===b;z.classList.toggle('chosen',on);z.setAttribute('aria-pressed',on);});
+    check.disabled=false;
+  });
+  check.onclick=()=>{
+    if(checked){
+      const next=index+1;
+      if(kind==='video')state.videoIndex=next;else if(kind==='final')state.finalIndex=next;else state.missionIndex=next;
+      save();
+      quiz(target,questions,next,kind,complete);
+      return;
+    }
+    if(choice<0)return;
+    state.attempts++;
+    const correct=choice===q.a;
+    const fb=$('fb_'+kind);
+    if(correct){
+      checked=true;
+      const gained=xpFor(failsHere);
+      state.xp+=gained;
+      state.log.push({kind,question:q.q,answer:q.o[choice],correct:true,retries:failsHere,explanation:q.why});
+      save();updateHUD();route();
+      buttons.forEach(b=>b.disabled=true);
+      fb.className='feedback';
+      fb.innerHTML='<b>✓ Correcto.</b> <span class="xpgain">+'+gained+' XP'+(failsHere===0?' · ¡Primer intento!':'')+'</span><p>'+esc(q.why)+'</p>';
+      check.textContent=index===questions.length-1?'Desbloquear siguiente nivel ▸':'Siguiente desafío ▸';
+    }else{
+      failsHere++;state.fails++;
+      state.log.push({kind,question:q.q,answer:q.o[choice],correct:false,explanation:q.why});
+      save();route();
+      fb.className='feedback bad';
+      fb.innerHTML='<b>✗ Esa opción no resuelve el caso.</b><p>Vuelve a la lección de este nivel, compárala con el caso y selecciona otra opción. La explicación completa aparecerá cuando aciertes.</p>';
+      choice=-1;
+      buttons.forEach(b=>{b.classList.remove('chosen');b.setAttribute('aria-pressed','false');});
+      check.disabled=true;
+    }
+  };
+}
+
+/* ============ Misiones, jefe final y victoria ============ */
+function showVideoQuiz(){
+  $('videoQuiz').classList.remove('hide');
+  if(!$('videoQuizArea').dataset.ready){
+    $('videoQuizArea').dataset.ready='1';
+    quiz('videoQuizArea',videoQuestions,state.videoIndex,'video',()=>{
+      state.stage=1;state.missionIndex=0;save();
+      destroyVideo();
+      renderMission();setVisible('missionStage');
+    });
+  }
+}
+function renderMission(){
+  const m=missions[state.stage-1];
+  $('missionTag').textContent='Nivel '+String(state.stage).padStart(2,'0')+' · Dominio obligatorio';
+  $('missionTitle').textContent=m.title;
+  $('missionIntro').textContent=m.intro;
+  $('theory').innerHTML='<b style="color:var(--cyan)">Aprende el concepto</b><p>'+m.theory+'</p>';
+  $('caseText').textContent=m.case;
+  quiz('missionQuiz',m.qs,state.missionIndex,'mission',()=>{
+    state.stage++;state.missionIndex=0;save();
+    if(state.stage<=6){renderMission();setVisible('missionStage');}
+    else{renderFinal();setVisible('finalStage');}
+  });
+}
+function renderFinal(){
+  quiz('finalQuiz',finalQuestions,state.finalIndex,'final',()=>{
+    state.stage=8;
+    if(!state.completedAt)state.completedAt=new Date().toISOString();
+    save();
+    showResult();setVisible('result');
+  });
+}
+function showResult(){
+  $('summary').textContent=state.name+', completaste el briefing, las seis misiones y el caso integrador.';
+  $('xpFinal').textContent=state.xp;
+  $('precisionFinal').textContent=precision()+'%';
+  $('certName').textContent=state.name;
+  $('certCourse').textContent=state.course||'Psicología del Consumidor';
+  $('certStats').textContent='Precisión: '+precision()+'% · '+state.xp+' XP';
+  $('certDate').textContent='Finalizado el '+fmtDate(state.completedAt);
+}
+
+/* ============ Informe ============ */
+$('download').onclick=()=>{
+  const body=[
+    'THE CONSUMER MIND · INFORME INDIVIDUAL',
+    'Estudiante: '+state.name,
+    'Curso: '+(state.course||'Psicología del Consumidor'),
+    'Fecha de finalización: '+fmtDate(state.completedAt),
+    'Niveles: 8 de 8',
+    'Desafíos superados: '+TOTAL_Q,
+    'XP total: '+state.xp,
+    'Precisión: '+precision()+'% ('+state.fails+' intentos fallidos)',
+    'Intentos registrados: '+state.attempts,
+    state.unlocked?'Nota: la etapa de video se habilitó con código docente.':'',
+    '','RESPUESTAS E INTENTOS',
+    ...state.log.map((r,i)=>'\n'+(i+1)+'. ['+r.kind+'] '+r.question+'\nRespuesta: '+r.answer+'\nResultado: '+(r.correct?'Correcta':'Fallida')+'\nExplicación: '+r.explanation),
+    '','Documento formativo generado en el navegador.'
+  ].filter(Boolean).join('\n');
+  const url=URL.createObjectURL(new Blob([body],{type:'text/plain;charset=utf-8'}));
+  const a=document.createElement('a');
+  a.href=url;a.download='Informe_Consumer_Mind_'+state.name.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ]+/gi,'_')+'.txt';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+};
+$('print').onclick=()=>window.print();
+</script>
+</body>
+</html>
